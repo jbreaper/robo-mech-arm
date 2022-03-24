@@ -29,6 +29,8 @@
 			"array": "cpp",
 			"initializer_list": "cpp",
 			"utility": "cpp"
-		}
+		},
+		"editor.formatOnPaste": true,
+		"editor.formatOnSave": true
 	}
 }
