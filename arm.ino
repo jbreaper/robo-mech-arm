@@ -24,6 +24,9 @@ float angle[5];
 
 int pos = 0;
 
+bool smooth = true;
+bool grab = false;
+
 volatile bool emergancy_stop = false;
 
 cppQueue cmds(sizeof(String), 7, FIFO, false);
@@ -53,7 +56,7 @@ void e_stop()
 //
 // }
 
-bool joint_to(float theta[5])
+bool joint_to(int theta[5])
 {
   for (int i = 0; i < (sizeof theta / sizeof *theta); i++)
   {
@@ -61,9 +64,21 @@ bool joint_to(float theta[5])
   }
 }
 
+void joint_reset()
+{
+  int zeroes[5] = {
+      0,
+      0,
+      0,
+      0,
+      0,
+  };
+  joint_to(zeroes);
+}
+
 void input()
 {
-  if (Serial1.available() > 0)
+  if (Serial.available() > 0)
   {
     char *x;
     int availableBytes = Serial.available();
@@ -84,15 +99,77 @@ void input()
   }
 }
 
-void interperate(String msg)
+void interperate()
 {
-  char type;
-  // char
+  char type[5];
+
+  while (!(cmds.isEmpty()))
+  {
+    cmds.pop(&type);
+
+    if (((type[0] == 'e' || type[0] == 'E') && (type[0] == 's' || type[0] == 'S')) && emergancy_stop == false)
+    {
+      e_stop();
+    }
+    else if (((type[0] == 'e' || type[0] == 'E') && (type[0] == 's' || type[0] == 'S')) && emergancy_stop == false)
+    {
+      digitalWrite(ESO, HIGH);
+      emergancy_stop = false;
+    }
+
+    switch (type[0])
+    {
+    case 'g':
+    case 'G':
+      switch (type[1])
+      {
+      case '0':
+        joint_reset();
+        break;
+      case '1':
+        smooth = false;
+        break;
+      case '2':
+        smooth = true;
+        break;
+      case '3':
+        selinoid(grab);
+        grab != grab;
+        break;
+      }
+      break;
+    case 'x':
+    case 'X':
+      // convert char array into in excluding first character
+      break;
+    case 'y':
+    case 'Y':
+      break;
+    case 'z':
+    case 'Z':
+      break;
+    case 'a':
+    case 'A':
+      break;
+    case 'b':
+    case 'B':
+      break;
+    case 'c':
+    case 'C':
+      break;
+    case 'd':
+    case 'D':
+      break;
+    case 'e':
+    case 'E':
+      break;
+    }
+  }
 }
 
-void selinoid(bool grab)
+void selinoid(bool g)
 {
-  if (grab)
+  if (g)
   {
     digitalWrite(S1, HIGH);
   }
