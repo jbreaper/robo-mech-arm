@@ -73,6 +73,7 @@ void joint_reset()
       0,
       0,
   };
+  
   joint_to(zeroes);
 }
 
