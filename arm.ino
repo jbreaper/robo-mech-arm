@@ -20,7 +20,8 @@ const int joint_out[5] = {J1, J2, J3, J4, J5};
 
 Servo joint[5];
 
-float angle[5];
+int angle[5];
+int coord[3];
 
 int pos = 0;
 
@@ -42,7 +43,9 @@ void setup()
 
   Serial.begin(9600);
   for (int i = 0; i < 6; i++)
+  {
     joint[i].attach(joint_out[i]);
+  }
 }
 
 // interupt function used to stop arm in case of emergancy
@@ -73,7 +76,7 @@ void joint_reset()
       0,
       0,
   };
-  
+
   joint_to(zeroes);
 }
 
@@ -108,14 +111,16 @@ void interperate()
   {
     cmds.pop(&type);
 
-    if (((type[0] == 'e' || type[0] == 'E') && (type[0] == 's' || type[0] == 'S')) && emergancy_stop == false)
+    if (((type[0] == 'e' || type[0] == 'E') && (type[1] == 's' || type[1] == 'S')) && emergancy_stop == false)
     {
       e_stop();
+      break;
     }
-    else if (((type[0] == 'e' || type[0] == 'E') && (type[0] == 's' || type[0] == 'S')) && emergancy_stop == false)
+    else if (((type[0] == 'e' || type[0] == 'E') && (type[1] == 's' || type[1] == 'S')) && emergancy_stop == false)
     {
       digitalWrite(ESO, HIGH);
       emergancy_stop = false;
+      break;
     }
 
     switch (type[0])
@@ -141,28 +146,91 @@ void interperate()
       break;
     case 'x':
     case 'X':
-      // convert char array into in excluding first character
+      if (type[0] == 'x')
+      {
+        sscanf(type, "x%u", &coord[0]);
+      }
+      else
+      {
+        sscanf(type, "X%u", &coord[0]);
+      }
       break;
     case 'y':
     case 'Y':
+      if (type[0] == 'y')
+      {
+        sscanf(type, "y%u", &coord[1]);
+      }
+      else
+      {
+        sscanf(type, "Y%u", &coord[1]);
+      }
       break;
     case 'z':
     case 'Z':
+      if (type[0] == 'z')
+      {
+        sscanf(type, "z%u", &coord[2]);
+      }
+      else
+      {
+        sscanf(type, "Z%u", &coord[2]);
+      }
       break;
     case 'a':
     case 'A':
+      if (type[0] == 'a')
+      {
+        sscanf(type, "A%u", &coord[2]);
+      }
+      else
+      {
+        sscanf(type, "A%u", &coord[2]);
+      }
       break;
     case 'b':
     case 'B':
+      if (type[0] == 'b')
+      {
+        sscanf(type, "b%u", &coord[2]);
+      }
+      else
+      {
+        sscanf(type, "B%u", &coord[2]);
+      }
       break;
     case 'c':
     case 'C':
+      if (type[0] == 'c')
+      {
+        sscanf(type, "c%u", &coord[2]);
+      }
+      else
+      {
+        sscanf(type, "C%u", &coord[2]);
+      }
       break;
     case 'd':
     case 'D':
+      if (type[0] == 'd')
+      {
+        sscanf(type, "d%u", &coord[2]);
+      }
+      else
+      {
+        sscanf(type, "D%u", &coord[2]);
+      }
       break;
     case 'e':
     case 'E':
+      if (type[0] == 'e')
+      {
+        sscanf(type, "e%u", &coord[2]);
+      }
+      else
+      {
+        sscanf(type, "E%u", &coord[2]);
+      }
       break;
     }
   }
