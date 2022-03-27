@@ -46,6 +46,10 @@ void setup()
   {
     joint[i].attach(joint_out[i]);
   }
+
+  while (!Serial)
+  {
+  }
 }
 
 // interupt function used to stop arm in case of emergancy
@@ -181,55 +185,55 @@ void interperate()
     case 'A':
       if (type[0] == 'a')
       {
-        sscanf(type, "A%u", &coord[2]);
+        sscanf(type, "A%u", &angle[0]);
       }
       else
       {
-        sscanf(type, "A%u", &coord[2]);
+        sscanf(type, "A%u", &angle[0]);
       }
       break;
     case 'b':
     case 'B':
       if (type[0] == 'b')
       {
-        sscanf(type, "b%u", &coord[2]);
+        sscanf(type, "b%u", &angle[1]);
       }
       else
       {
-        sscanf(type, "B%u", &coord[2]);
+        sscanf(type, "B%u", &angle[1]);
       }
       break;
     case 'c':
     case 'C':
       if (type[0] == 'c')
       {
-        sscanf(type, "c%u", &coord[2]);
+        sscanf(type, "c%u", &angle[2]);
       }
       else
       {
-        sscanf(type, "C%u", &coord[2]);
+        sscanf(type, "C%u", &angle[2]);
       }
       break;
     case 'd':
     case 'D':
       if (type[0] == 'd')
       {
-        sscanf(type, "d%u", &coord[2]);
+        sscanf(type, "d%u", &angle[3]);
       }
       else
       {
-        sscanf(type, "D%u", &coord[2]);
+        sscanf(type, "D%u", &angle[3]);
       }
       break;
     case 'e':
     case 'E':
       if (type[0] == 'e')
       {
-        sscanf(type, "e%u", &coord[2]);
+        sscanf(type, "e%u", &angle[4]);
       }
       else
       {
-        sscanf(type, "E%u", &coord[2]);
+        sscanf(type, "E%u", &angle[4]);
       }
       break;
     }
@@ -262,4 +266,17 @@ void reply(bool out_msg)
 
 void loop()
 {
+  if (Serial.available() > 0)
+  {
+    input();
+  }
+
+  interperate();
+
+  joint_to(angle);
+
+  if (cmds.isEmpty())
+  {
+    reply(true);
+  }
 }
