@@ -67,7 +67,7 @@ void e_stop()
 
 bool joint_to(int theta[5], int rate = 90)
 {
-  for (int i = 0; i < (sizeof theta / sizeof *theta); i++)
+  for (int i = 0; i < 6; i++)
   {
     joint[i].easeTo(theta[i], rate);
   }
