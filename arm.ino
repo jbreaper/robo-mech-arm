@@ -12,13 +12,14 @@
 #define J5 14
 
 const int joint_out[5] = {J1, J2, J3, J4, J5};
+int ini_angle[5] = {45, 45, 45, 45, 45};
 
 #define S1 15
 
 #define ESO 32
 #define ESI 31
 
-Servo joint[5];
+ServoEasing joint[5];
 
 int angle[5];
 int coord[3];
@@ -44,7 +45,8 @@ void setup()
   Serial.begin(9600);
   for (int i = 0; i < 6; i++)
   {
-    joint[i].attach(joint_out[i]);
+    joint[i].attach(joint_out[i], ini_angle[i]);
+    joint[i].setEasingType(EASE_QUADRATIC_IN_OUT);
   }
 
   while (!Serial)
@@ -63,11 +65,11 @@ void e_stop()
 //
 // }
 
-bool joint_to(int theta[5])
+bool joint_to(int theta[5], int rate = 90)
 {
   for (int i = 0; i < (sizeof theta / sizeof *theta); i++)
   {
-    joint[i].write(theta[i]);
+    joint[i].easeTo(theta[i], rate);
   }
 }
 
@@ -81,7 +83,7 @@ void joint_reset()
       0,
   };
 
-  joint_to(zeroes);
+  joint_to(ini_angle, 180);
 }
 
 void input()
@@ -137,10 +139,14 @@ void interperate()
         joint_reset();
         break;
       case '1':
-        smooth = false;
+        smooth = true;
+        for (int i = 0; i < 6; i++)
+          joint[i].setEasingType(EASE_QUADRATIC_IN_OUT);
         break;
       case '2':
-        smooth = true;
+        smooth = false;
+        for (int i = 0; i < 6; i++)
+          joint[i].setEasingType(EASE_LINEAR);
         break;
       case '3':
         selinoid(grab);
