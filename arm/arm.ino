@@ -33,7 +33,7 @@ int pos = 0;
 
 bool smooth = true;
 bool grab = false;
-bool grabbed = false; 
+bool grabbed = false;
 
 volatile bool emergancy_stop = false;
 
@@ -65,6 +65,8 @@ void e_stop()
 {
 	digitalWrite(ESO, LOW);
 	emergancy_stop = true;
+
+	cmds.flush();
 }
 
 // bool move_to(float x, float y, float z, float theta){
@@ -128,130 +130,140 @@ void interperate()
 			e_stop();
 			break;
 		}
-		else if (((type[0] == 'e' || type[0] == 'E') && (type[1] == 's' || type[1] == 'S')) && emergancy_stop == false)
+		else if (((type[0] == 'e' || type[0] == 'E') && (type[1] == 's' || type[1] == 'S')) && emergancy_stop == true)
 		{
 			digitalWrite(ESO, HIGH);
 			emergancy_stop = false;
 			break;
 		}
 
-		switch (type[0])
+		if (emergancy_stop == false)
 		{
-		case 'g':
-		case 'G':
-			switch (type[1])
+			switch (type[0])
 			{
-			case '0':
-				joint_reset();
+			case 'g':
+			case 'G':
+				switch (type[1])
+				{
+				case '0':
+					joint_reset();
+					break;
+				case '1':
+					smooth = true;
+					for (int i = 0; i < 6; i++)
+						ServoEasing::ServoEasingArray[i]->setEasingType(EASE_QUADRATIC_IN_OUT);
+					break;
+				case '2':
+					smooth = false;
+					for (int i = 0; i < 6; i++)
+						ServoEasing::ServoEasingArray[i]->setEasingType(EASE_LINEAR);
+					break;
+				case '3':
+					gripper(grab);
+					grabbed != grab;
+					break;
+				}
 				break;
-			case '1':
-				smooth = true;
-				for (int i = 0; i < 6; i++)
-					ServoEasing::ServoEasingArray[i]->setEasingType(EASE_QUADRATIC_IN_OUT);
+			case 'x':
+			case 'X':
+				if (type[0] == 'x')
+				{
+					sscanf(type, "x%u", &coord[0]);
+				}
+				else
+				{
+					sscanf(type, "X%u", &coord[0]);
+				}
 				break;
-			case '2':
-				smooth = false;
-				for (int i = 0; i < 6; i++)
-					ServoEasing::ServoEasingArray[i]->setEasingType(EASE_LINEAR);
+			case 'y':
+			case 'Y':
+				if (type[0] == 'y')
+				{
+					sscanf(type, "y%u", &coord[1]);
+				}
+				else
+				{
+					sscanf(type, "Y%u", &coord[1]);
+				}
 				break;
-			case '3':
-				grabbed != grab;
+			case 'z':
+			case 'Z':
+				if (type[0] == 'z')
+				{
+					sscanf(type, "z%u", &coord[2]);
+				}
+				else
+				{
+					sscanf(type, "Z%u", &coord[2]);
+				}
+				break;
+			case 'a':
+			case 'A':
+				if (type[0] == 'a')
+				{
+					sscanf(type, "A%u", &angle[0]);
+				}
+				else
+				{
+					sscanf(type, "A%u", &angle[0]);
+				}
+				break;
+			case 'b':
+			case 'B':
+				if (type[0] == 'b')
+				{
+					sscanf(type, "b%u", &angle[1]);
+				}
+				else
+				{
+					sscanf(type, "B%u", &angle[1]);
+				}
+				break;
+			case 'c':
+			case 'C':
+				if (type[0] == 'c')
+				{
+					sscanf(type, "c%u", &angle[2]);
+				}
+				else
+				{
+					sscanf(type, "C%u", &angle[2]);
+				}
+				break;
+			case 'd':
+			case 'D':
+				if (type[0] == 'd')
+				{
+					sscanf(type, "d%u", &angle[3]);
+				}
+				else
+				{
+					sscanf(type, "D%u", &angle[3]);
+				}
+				break;
+			case 'e':
+			case 'E':
+				if (type[0] == 'e')
+				{
+					sscanf(type, "e%u", &angle[4]);
+				}
+				else
+				{
+					sscanf(type, "E%u", &angle[4]);
+				}
 				break;
 			}
-			break;
-		case 'x':
-		case 'X':
-			if (type[0] == 'x')
-			{
-				sscanf(type, "x%u", &coord[0]);
-			}
-			else
-			{
-				sscanf(type, "X%u", &coord[0]);
-			}
-			break;
-		case 'y':
-		case 'Y':
-			if (type[0] == 'y')
-			{
-				sscanf(type, "y%u", &coord[1]);
-			}
-			else
-			{
-				sscanf(type, "Y%u", &coord[1]);
-			}
-			break;
-		case 'z':
-		case 'Z':
-			if (type[0] == 'z')
-			{
-				sscanf(type, "z%u", &coord[2]);
-			}
-			else
-			{
-				sscanf(type, "Z%u", &coord[2]);
-			}
-			break;
-		case 'a':
-		case 'A':
-			if (type[0] == 'a')
-			{
-				sscanf(type, "A%u", &angle[0]);
-			}
-			else
-			{
-				sscanf(type, "A%u", &angle[0]);
-			}
-			break;
-		case 'b':
-		case 'B':
-			if (type[0] == 'b')
-			{
-				sscanf(type, "b%u", &angle[1]);
-			}
-			else
-			{
-				sscanf(type, "B%u", &angle[1]);
-			}
-			break;
-		case 'c':
-		case 'C':
-			if (type[0] == 'c')
-			{
-				sscanf(type, "c%u", &angle[2]);
-			}
-			else
-			{
-				sscanf(type, "C%u", &angle[2]);
-			}
-			break;
-		case 'd':
-		case 'D':
-			if (type[0] == 'd')
-			{
-				sscanf(type, "d%u", &angle[3]);
-			}
-			else
-			{
-				sscanf(type, "D%u", &angle[3]);
-			}
-			break;
-		case 'e':
-		case 'E':
-			if (type[0] == 'e')
-			{
-				sscanf(type, "e%u", &angle[4]);
-			}
-			else
-			{
-				sscanf(type, "E%u", &angle[4]);
-			}
-			break;
+		}
+		else
+		{
+			joint_reset();
+			Serial.println("!!EMERCANCY STOPPED!!");
+			delay(1000);
 		}
 	}
 }
 
-bool selinoid(bool g)
+bool gripper(bool g)
 {
 	if (g)
 	{
@@ -286,15 +298,18 @@ void loop()
 
 	interperate();
 
-	joint_to(angle);
-
-	if (grabbed != grab)
+	if (emergancy_stop == false)
 	{
-		grab = selinoid(grabbed);
-	}
+		joint_to(angle);
 
-	if (cmds.isEmpty())
-	{
-		reply(true);
+		if (grabbed != grab)
+		{
+			grab = gripper(grabbed);
+		}
+
+		if (cmds.isEmpty())
+		{
+			reply(true);
+		}
 	}
 }
