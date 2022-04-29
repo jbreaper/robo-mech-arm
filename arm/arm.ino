@@ -13,13 +13,13 @@
 #define J5 27
 #define S1 12
 
-#define J1_Rate 90    // deg/s
-#define J1_CW   77
-#define J1_CCW  109.5
+#define J1_Rate 90 // deg/s
+#define J1_CW 77
+#define J1_CCW 109.5
 
-#define J5_Rate 180   // deg/s
-#define J5_CW   76.9
-#define J5_CCW  109
+#define J5_Rate 180 // deg/s
+#define J5_CW 76.9
+#define J5_CCW 109
 
 #define G_OPEN 180
 #define G_CLOSE 90
@@ -57,7 +57,7 @@ cppQueue cmds(sizeof(String), 7, FIFO, false);
 
 void setup()
 {
-  delay(1000);
+	delay(1000);
 	Serial.begin(115200);
 
 	Serial.println("booting: begin");
@@ -67,7 +67,7 @@ void setup()
 	attachInterrupt(ESI, e_stop, HIGH);
 
 	gripper.attach(S1);
-//  gripper.setEasingType(EASE_QUADRATIC_IN_OUT);
+	//  gripper.setEasingType(EASE_QUADRATIC_IN_OUT);
 
 	Serial.println("booting: pins assigned");
 	for (int i = 0; i < 5; i++)
@@ -101,14 +101,15 @@ void setup()
 
 	Serial.println("booting: servos assigned");
 
-	while (!Serial);
+	while (!Serial)
+		;
 
-  joint2.write(ini_angle[1]-15);
-  joint3.write(ini_angle[2]-15);
-  joint4.write(ini_angle[3]+15);
+	joint2.write(ini_angle[1] - 15);
+	joint3.write(ini_angle[2] - 15);
+	joint4.write(ini_angle[3] + 15);
 
-  Serial.println("booting: complete");
-  delay(1000);
+	Serial.println("booting: complete");
+	delay(1000);
 }
 
 // interupt function used to stop arm in case of emergancy
@@ -124,45 +125,57 @@ void e_stop()
 //
 // }
 
-void j1_move(float angle){  
-  float x = 0;
-  
-  if((j1_cur-angle) > 0){
-    x = (j1_cur-angle);
-    joint1.write(J1_CW);
-  } else if ((j1_cur-angle) < 0){
-    x = (angle-j1_cur);
-    joint1.write(J1_CCW);    
-  } else if (j1_cur == angle){
-    return;
-  }
+void j1_move(float angle)
+{
+	float x = 0;
 
-  delay(1000*(x/J1_Rate));
-  joint1.write(90);
-  j1_cur = angle;
+	if ((j1_cur - angle) > 0)
+	{
+		x = (j1_cur - angle);
+		joint1.write(J1_CW);
+	}
+	else if ((j1_cur - angle) < 0)
+	{
+		x = (angle - j1_cur);
+		joint1.write(J1_CCW);
+	}
+	else if (j1_cur == angle)
+	{
+		return;
+	}
+
+	delay(1000 * (x / J1_Rate));
+	joint1.write(90);
+	j1_cur = angle;
 }
 
-void j5_move(float angle){
-  float x = 0;
-  
-  if((j5_cur-angle) > 0){
-    x = (j5_cur-angle);
-    joint5.write(J5_CW);
-  } else if ((j5_cur-angle) < 0){
-    x = (angle-j5_cur);
-    joint5.write(J5_CCW);    
-  } else if (j5_cur == angle){
-    return;
-  }
+void j5_move(float angle)
+{
+	float x = 0;
 
-  delay(1000*(x/J5_Rate));
-  joint5.write(90);
-  j5_cur = angle;
+	if ((j5_cur - angle) > 0)
+	{
+		x = (j5_cur - angle);
+		joint5.write(J5_CW);
+	}
+	else if ((j5_cur - angle) < 0)
+	{
+		x = (angle - j5_cur);
+		joint5.write(J5_CCW);
+	}
+	else if (j5_cur == angle)
+	{
+		return;
+	}
+
+	delay(1000 * (x / J5_Rate));
+	joint5.write(90);
+	j5_cur = angle;
 }
 
 bool joint_to(int theta[5], int rate = 90)
 {
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		switch (i)
 		{
@@ -170,33 +183,30 @@ bool joint_to(int theta[5], int rate = 90)
 			j1_move(theta[i]);
 			break;
 		case 1:
-			joint2.easeTo((theta[i]-15), rate);
-//      Serial.print("joint 1: ");
-//      Serial.println(theta[i]);
+			joint2.easeTo((theta[i] - 15), rate);
+			// ServoEasing::ServoEasingArray[i]->easeTo((theta[i] - 15), rate);
 			break;
 		case 2:
-			joint3.easeTo((theta[i]-15), rate);
-//      Serial.print("joint 2: ");
-//      Serial.println(theta[i]);
+			joint3.easeTo((theta[i] - 15), rate);
+			// ServoEasing::ServoEasingArray[i]->easeTo((theta[i] - 15), rate);
 			break;
 		case 3:
-			joint4.easeTo((theta[i]+15), rate);
-//      Serial.print("joint 3: ");
-//      Serial.println(theta[i]);
+			joint4.easeTo((theta[i] + 15), rate);
+			// ServoEasing::ServoEasingArray[i]->easeTo((theta[i] + 15), rate);
 			break;
 		case 4:
 			j5_move(theta[i]);
 			break;
 		}
-		// ServoEasing::ServoEasingArray[i]->easeTo(theta[i], rate);
 	}
 }
 
 void joint_reset()
 {
-  for(int i = 0; i < 5; i++){
-    angle[i] = ini_angle[i];
-  }
+	for (int i = 0; i < 5; i++)
+	{
+		angle[i] = ini_angle[i];
+	}
 	joint_to(angle, 20);
 }
 
@@ -206,39 +216,33 @@ void input()
 	{
 		char *x;
 		int availableBytes = Serial.available();
-		char in[(availableBytes+1)];
-        
+		char in[(availableBytes + 1)];
+
 		for (int i = 0; i < availableBytes; i++)
 		{
 			in[i] = Serial.read();
 		}
-
-    Serial.print("in: ");
-    Serial.println(in);
 
 		x = strtok(in, " ");
 
 		while (x != NULL)
 		{
 			cmds.push(x);
-      Serial.print("cmd: ");
-      Serial.println(x);
+			Serial.print("cmd: ");
+			Serial.println(x);
 			x = strtok(NULL, " ");
 		}
 	}
 }
 
-void interperate()
+void interpreter()
 {
 	char type[5];
 
 	while (!(cmds.isEmpty()))
 	{
-    memset(&type, 0, sizeof(type));
+		memset(&type, 0, sizeof(type));
 		cmds.pop(&type);
-
-//    Serial.print("command: ");
-//    Serial.println(type);
 
 		if (((type[0] == 'e' || type[0] == 'E') && (type[1] == 's' || type[1] == 'S')) && emergancy_stop == false)
 		{
@@ -274,7 +278,7 @@ void interperate()
 						ServoEasing::ServoEasingArray[i]->setEasingType(EASE_LINEAR);
 					break;
 				case '3':
-					grab = grip(grab);
+					grabbed != grabbed;
 					break;
 				}
 				break;
@@ -354,8 +358,6 @@ void interperate()
 				{
 					sscanf(type, "D%u", &angle[3]);
 				}
-//        Serial.print("angle 4: ");
-//        Serial.println(angle[3]);
 				break;
 			case 'e':
 			case 'E':
@@ -390,7 +392,7 @@ bool grip(bool g)
 		gripper.write(G_OPEN);
 	}
 
-	return(!g);
+	return (!g);
 }
 
 void reply(bool out_msg)
@@ -407,15 +409,15 @@ void reply(bool out_msg)
 
 void loop()
 {
-  while(cmds.isEmpty())
-  {
-  	if (Serial.available() > 0)
-	  {
-		  input();
-	  }
-  }
+	while (cmds.isEmpty())
+	{
+		if (Serial.available() > 0)
+		{
+			input();
+		}
+	}
 
-	interperate();
+	interpreter();
 
 	if (emergancy_stop == false)
 	{
